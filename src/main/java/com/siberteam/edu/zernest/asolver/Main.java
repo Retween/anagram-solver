@@ -13,6 +13,31 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
+    private static final Map<Class<?>, IErrorHandler> errorHandlerMap =
+            new HashMap<>();
+    private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode =
+            new HashMap<>();
+
+    private static final IErrorHandler defaultHandler = new IErrorHandler() {
+        @Override
+        public void handleException(AnagramSolverExitCode exitCode,
+                                    Exception e) {
+            IErrorHandler.super.handleException(exitCode, e);
+        }
+    };
+
+    static {
+        errorHandlerMap.put(InterruptedException.class, defaultHandler);
+        errorExitCode.put(InterruptedException.class, AnagramSolverExitCode
+                .INTERRUPTED);
+
+        errorHandlerMap.put(IOException.class, defaultHandler);
+        errorExitCode.put(IOException.class, AnagramSolverExitCode
+                .INPUT_OUTPUT);
+
+        errorHandlerMap.put(AnagramSolverAppException.class, defaultHandler);
+    }
+
     public static void main(String[] args) {
         CommandLineValidator validator = new CommandLineValidator();
         try {
@@ -66,30 +91,5 @@ public class Main {
             defaultHandler.handleException(AnagramSolverExitCode
                     .UNEXPECTED_ERROR, e);
         }
-    }
-
-    private static final Map<Class<?>, IErrorHandler> errorHandlerMap =
-            new HashMap<>();
-    private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode =
-            new HashMap<>();
-
-    private static final IErrorHandler defaultHandler = new IErrorHandler() {
-        @Override
-        public void handleException(AnagramSolverExitCode exitCode,
-                                    Exception e) {
-            IErrorHandler.super.handleException(exitCode, e);
-        }
-    };
-
-    static {
-        errorHandlerMap.put(InterruptedException.class, defaultHandler);
-        errorExitCode.put(InterruptedException.class, AnagramSolverExitCode
-                .INTERRUPTED);
-
-        errorHandlerMap.put(IOException.class, defaultHandler);
-        errorExitCode.put(IOException.class, AnagramSolverExitCode
-                .INPUT_OUTPUT);
-
-        errorHandlerMap.put(AnagramSolverAppException.class, defaultHandler);
     }
 }
