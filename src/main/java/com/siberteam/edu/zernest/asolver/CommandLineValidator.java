@@ -1,9 +1,6 @@
 package com.siberteam.edu.zernest.asolver;
 
-import com.siberteam.edu.zernest.asolver.exceptions.AnagramSolverAppException;
-import com.siberteam.edu.zernest.asolver.exceptions.AnagramSolverExitCode;
 import org.apache.commons.cli.*;
-
 import java.io.File;
 
 public class CommandLineValidator {

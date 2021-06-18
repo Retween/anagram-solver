@@ -15,14 +15,16 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
     private final Queue<String> process;
     private final BlockingQueue<String> words;
     private final Set<String> dictionary;
+    private final CountDownLatch producersLatch;
 
     public UrlToWordsParserProducer(Queue<String> process,
                                     BlockingQueue<String> words,
-                                    Set<String> dictionary) {
-        log("Creat");
+                                    Set<String> dictionary,
+                                    CountDownLatch producersLatch) {
         this.process = process;
         this.words = words;
         this.dictionary = dictionary;
+        this.producersLatch = producersLatch;
     }
 
     @Override
@@ -33,7 +35,6 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
                 URL url = new URL(urlFilePath);
                 try (BufferedReader br = new BufferedReader(
                         new InputStreamReader(url.openStream()))) {
-
                     String inputString;
                     while ((inputString = br.readLine()) != null) {
                         parseString(inputString);
@@ -41,11 +42,11 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
                 }
             }
         } catch (IOException e) {
-            log("Invalid URL: " + urlFilePath + "\nException: " + e);
+            log("Invalid URL: " + urlFilePath);
         } catch (InterruptedException e) {
-            log("Thread was interrupted " + "\nException: " + e);
+            log("Thread was interrupted " + "\tException: " + e);
         } finally {
-            log("Finisded PProducer");
+            producersLatch.countDown();
         }
     }
 

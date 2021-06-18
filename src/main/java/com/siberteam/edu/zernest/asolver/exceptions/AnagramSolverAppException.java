@@ -9,13 +9,14 @@ public class AnagramSolverAppException extends Exception {
         this.exitCode = exitCode;
     }
 
-    public AnagramSolverAppException(AnagramSolverExitCode exitCode) {
-        super("Anagram Solver app exception");
-        this.exitCode = exitCode;
-    }
-
     public AnagramSolverExitCode getExitCode() {
         return exitCode;
     }
 
+    @Override
+    public String toString() {
+        return "AnagramSolverAppException" + "[" +
+                "exitCode=" + exitCode +
+                ']';
+    }
 }

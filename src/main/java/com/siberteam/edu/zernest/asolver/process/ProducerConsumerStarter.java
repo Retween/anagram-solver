@@ -6,15 +6,17 @@ import java.util.*;
 import java.util.concurrent.*;
 
 public class ProducerConsumerStarter {
+    public final static String POISON = "#";
     private final ExecutorService producersExecutor;
     private final ExecutorService consumersExecutor;
     private final int producersCount;
     private final int consumersCount;
+    private final CountDownLatch producersLatch;
+    private final CountDownLatch consumersLatch;
     private final Queue<String> process;
     private final BlockingQueue<String> words;
     private final Set<String> dictionary;
     private final Map<String, Set<String>> anagramsMap;
-    private final CountDownLatch consumersLatch;
 
     public ProducerConsumerStarter(Queue<String> process, int producersCount,
                                    int consumersCount) {
@@ -23,29 +25,36 @@ public class ProducerConsumerStarter {
         this.consumersCount = consumersCount;
         producersExecutor = Executors.newFixedThreadPool(producersCount);
         consumersExecutor = Executors.newFixedThreadPool(consumersCount);
-        words = new ArrayBlockingQueue<>(500);
+        words = new ArrayBlockingQueue<>(1000);
         dictionary = Sets.newConcurrentHashSet();
         anagramsMap = new ConcurrentHashMap<>();
+        producersLatch = new CountDownLatch(producersCount);
         consumersLatch = new CountDownLatch(consumersCount);
     }
 
-    public void start() throws InterruptedException {
+    public void startThreads() throws InterruptedException {
         for (int i = 0; i < producersCount; i++) {
             producersExecutor.execute(new UrlToWordsParserProducer(process,
-                    words, dictionary));
+                    words, dictionary, producersLatch));
         }
-        producersExecutor.shutdown();
 
         for (int i = 0; i < consumersCount; i++) {
             consumersExecutor.execute(new WordsToAnagramHandlerConsumer(words,
                     anagramsMap, consumersLatch));
         }
-        consumersExecutor.shutdown();
+
+        producersLatch.await();
+        producersExecutor.shutdown();
+
+        for (int i = 0; i < consumersCount; i++) {
+            words.put(POISON);
+        }
 
         consumersLatch.await();
+        consumersExecutor.shutdown();
     }
 
-    public List<Set<String>> getAnagramsMap() {
+    public List<Set<String>> getAnagramsList() {
         anagramsMap.entrySet().removeIf(entry -> entry.getValue().size() <= 1);
         return new ArrayList<>(anagramsMap.values());
     }

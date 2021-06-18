@@ -1,0 +1,1 @@
+file:///home/retw/IdeaProjects/anagram-solver/src/test/data/test.txt

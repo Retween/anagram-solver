@@ -9,12 +9,13 @@ import com.siberteam.edu.zernest.asolver.process.ProducerConsumerStarter;
 import org.apache.commons.cli.ParseException;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
         CommandLineValidator validator = new CommandLineValidator();
         try {
-            long s = System.currentTimeMillis();
             validator.parseCommandLine(args);
             File inputFile = validator.getInputFile();
             File outputFile = validator.getOutputFile();
@@ -27,12 +28,11 @@ public class Main {
                         inputFile.getName());
             }
 
-//            if (outputFile.exists() && outputFile.isFile()) {
-//                throw new AnagramSolverAppException(
-//                        AnagramSolverExitCode.FILE_ALREADY_EXISTS,
-//                        outputFile.getName());
-//            }
-
+            if (outputFile.exists() && outputFile.isFile()) {
+                throw new AnagramSolverAppException(
+                        AnagramSolverExitCode.FILE_ALREADY_EXISTS,
+                        outputFile.getName());
+            }
 
             try (InputStream inputStream = new FileInputStream(inputFile);
                  OutputStream outputStream = new FileOutputStream(outputFile)) {
@@ -42,25 +42,54 @@ public class Main {
 
                 ProducerConsumerStarter starter = new ProducerConsumerStarter(
                         reader.getUrlQueue(), producersCount, consumersCount);
-                starter.start();
+                starter.startThreads();
 
                 AnagramsToOutputStreamWriter writer =
                         new AnagramsToOutputStreamWriter(outputStream);
 
-                writer.writeListToFile(starter.getAnagramsMap());
+                writer.writeListToFile(starter.getAnagramsList());
+            }
+        } catch (Exception e) {
+            if (e instanceof ParseException) {
+                defaultHandler.handleException(validator, e);
             }
 
-            long f = System.currentTimeMillis();
-            System.out.println(f - s);
-        } catch (IOException | ParseException | AnagramSolverAppException | InterruptedException e) {
-            handler.handleException(AnagramSolverExitCode.UNEXPECTED_ERROR, e);
+            IErrorHandler handler = errorHandlerMap.get(e.getClass());
+            if (handler != null) {
+                if (e instanceof AnagramSolverAppException) {
+                    handler.handleException(((AnagramSolverAppException) e)
+                            .getExitCode(), e);
+                }
+                handler.handleException(errorExitCode.get(e.getClass()), e);
+            }
+
+            defaultHandler.handleException(AnagramSolverExitCode
+                    .UNEXPECTED_ERROR, e);
         }
     }
 
-    public static IErrorHandler handler = new IErrorHandler() {
+    private static final Map<Class<?>, IErrorHandler> errorHandlerMap =
+            new HashMap<>();
+    private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode =
+            new HashMap<>();
+
+    private static final IErrorHandler defaultHandler = new IErrorHandler() {
         @Override
-        public void handleException(AnagramSolverExitCode exitCode, Exception e) {
+        public void handleException(AnagramSolverExitCode exitCode,
+                                    Exception e) {
             IErrorHandler.super.handleException(exitCode, e);
         }
     };
+
+    static {
+        errorHandlerMap.put(InterruptedException.class, defaultHandler);
+        errorExitCode.put(InterruptedException.class, AnagramSolverExitCode
+                .INTERRUPTED);
+
+        errorHandlerMap.put(IOException.class, defaultHandler);
+        errorExitCode.put(IOException.class, AnagramSolverExitCode
+                .INPUT_OUTPUT);
+
+        errorHandlerMap.put(AnagramSolverAppException.class, defaultHandler);
+    }
 }

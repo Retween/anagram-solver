@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 public class WordsToAnagramHandlerConsumer implements Runnable, ILogger {
     private final BlockingQueue<String> words;
@@ -27,16 +26,15 @@ public class WordsToAnagramHandlerConsumer implements Runnable, ILogger {
     public void run() {
         try {
             String word;
-            while ((word = words.poll(5, TimeUnit.SECONDS)) != null) {
+            while (!(word = words.take()).equals(ProducerConsumerStarter
+                    .POISON)) {
                 String alphabeticalWord = getAlphabeticalString(word);
                 anagramsMap.computeIfAbsent(alphabeticalWord, k ->
                         new HashSet<>()).add(word);
             }
-
         } catch (InterruptedException e) {
             log("Thread was interrupted " + "\nException: " + e);
         } finally {
-            log("Finised CConsumer");
             consumersLatch.countDown();
         }
     }

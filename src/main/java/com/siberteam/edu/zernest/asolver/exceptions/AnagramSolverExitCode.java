@@ -5,9 +5,7 @@ public enum AnagramSolverExitCode {
     CANNOT_OPEN_INPUT(66, "File not found"),
     INPUT_OUTPUT(74, "Input/Output exception was caught"),
     FILE_ALREADY_EXISTS(74, "File already exists"),
-    CLASS_NOT_FOUND(64, "Class not found"),
-    INSTANTIATION(64, "Instantiation exception was caught"),
-    ILLEGAL_ACCESS(64, "Illegal Access exception was caught"),
+    INTERRUPTED(64, "Interrupted exception was caught"),
     UNEXPECTED_ERROR(64, "Unexpected error was caught");
 
     private final int code;
@@ -26,5 +24,11 @@ public enum AnagramSolverExitCode {
         return description;
     }
 
-    //////////////////////
+    @Override
+    public String toString() {
+        return "AnagramSolverExitCode" + "[" +
+                "code=" + code +
+                ", description='" + description + '\'' +
+                ']';
+    }
 }

@@ -1,6 +1,6 @@
+file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/AtlasShrugged.fb2
 file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/Uve.fb2
 file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/QuietlyFlowsTheDon.fb2
-file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/AtlasShrugged.fb2
 file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/TheCastle.fb2
 file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/TheTrial.fb2
 file:///home/retw/IdeaProjects/anagram-solver/src/main/resources/books/GunsGermsAndSteel.fb2
