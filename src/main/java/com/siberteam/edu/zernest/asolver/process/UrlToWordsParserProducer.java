@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Queue;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
@@ -54,12 +55,19 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
         if (!inputString.isEmpty()) {
             for (String word : inputString.toLowerCase()
                     .split("[\\p{Punct}\\s«»+]")) {
-                if (word.matches("[А-Яа-яЁё]{3,}")
+                if (word.matches("[А-Яа-яЁё]{3,}")      ////////////////Tokenizer
                         && !dictionary.contains(word)) {
                     dictionary.add(word);
                     words.put(word);
                 }
             }
+        }
+    }
+
+    private void parseString2(String inputString) throws InterruptedException {
+        if (!inputString.isEmpty()) {
+            StringTokenizer tokenizer = new StringTokenizer(inputString);
+//            while (tokenizer.hasMoreTokens())
         }
     }
 

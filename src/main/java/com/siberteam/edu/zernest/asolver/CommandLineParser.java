@@ -1,18 +1,22 @@
 package com.siberteam.edu.zernest.asolver;
 
+import com.siberteam.edu.zernest.asolver.exceptions.AnagramSolverAppException;
+import com.siberteam.edu.zernest.asolver.exceptions.AnagramSolverExitCode;
 import org.apache.commons.cli.*;
+
 import java.io.File;
 
-public class CommandLineValidator {
+public class CommandLineParser {
     private Options options;
     private File inputFile;
     private File outputFile;
     private int producersCount;
     private int consumersCount;
 
-    public void parseCommandLine(String[] args) throws ParseException {
+    public void parseCommandLine(String[] args) throws ParseException,
+            AnagramSolverAppException {
         options = new Options();
-        CommandLineParser parser = new DefaultParser();
+        org.apache.commons.cli.CommandLineParser parser = new DefaultParser();
 
         options.addRequiredOption("i", "inputFile", true,
                 "File with URL addresses list");
@@ -28,6 +32,18 @@ public class CommandLineValidator {
         outputFile = new File(cmd.getOptionValue("o"));
         producersCount = Integer.parseInt(cmd.getOptionValue("p"));
         consumersCount = Integer.parseInt(cmd.getOptionValue("c"));
+
+        if (!inputFile.exists()) {
+            throw new AnagramSolverAppException(
+                    AnagramSolverExitCode.CANNOT_OPEN_INPUT,
+                    inputFile.getName());
+        }
+
+        if (outputFile.exists() && outputFile.isFile()) {
+            throw new AnagramSolverAppException(
+                    AnagramSolverExitCode.FILE_ALREADY_EXISTS,
+                    outputFile.getName());
+        }
 
         if (producersCount < 1 || consumersCount < 1) {
             throw new ParseException("producersCount: " + producersCount

@@ -15,6 +15,7 @@ import java.util.Map;
 public class Main {
     private static final Map<Class<?>, IErrorHandler> errorHandlerMap =
             new HashMap<>();
+
     private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode =
             new HashMap<>();
 
@@ -39,34 +40,20 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        CommandLineValidator validator = new CommandLineValidator();
+        CommandLineParser parser = new CommandLineParser();
         try {
-            validator.parseCommandLine(args);
-            File inputFile = validator.getInputFile();
-            File outputFile = validator.getOutputFile();
-            int producersCount = validator.getProducersCount();
-            int consumersCount = validator.getConsumersCount();
+            parser.parseCommandLine(args);
 
-            if (!inputFile.exists()) {
-                throw new AnagramSolverAppException(
-                        AnagramSolverExitCode.CANNOT_OPEN_INPUT,
-                        inputFile.getName());
-            }
-
-            if (outputFile.exists() && outputFile.isFile()) {
-                throw new AnagramSolverAppException(
-                        AnagramSolverExitCode.FILE_ALREADY_EXISTS,
-                        outputFile.getName());
-            }
-
-            try (InputStream inputStream = new FileInputStream(inputFile);
-                 OutputStream outputStream = new FileOutputStream(outputFile)) {
-
+            try (InputStream inputStream = new FileInputStream(parser
+                    .getInputFile());
+                 OutputStream outputStream = new FileOutputStream(parser
+                         .getOutputFile())) {
                 InputStreamToQueueReader reader =
                         new InputStreamToQueueReader(inputStream);
 
                 ProducerConsumerStarter starter = new ProducerConsumerStarter(
-                        reader.getUrlQueue(), producersCount, consumersCount);
+                        reader.getUrlQueue(), parser.getProducersCount(),
+                        parser.getConsumersCount());
                 starter.startThreads();
 
                 AnagramsToOutputStreamWriter writer =
@@ -76,7 +63,9 @@ public class Main {
             }
         } catch (Exception e) {
             if (e instanceof ParseException) {
-                defaultHandler.handleException(validator, e);
+                parser.printHelp();
+                defaultHandler.handleException(AnagramSolverExitCode
+                        .COMMAND_LINE_USAGE, e);
             }
 
             IErrorHandler handler = errorHandlerMap.get(e.getClass());
