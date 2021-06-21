@@ -25,9 +25,14 @@ public class WordsToAnagramHandlerConsumer implements Runnable, ILogger {
     @Override
     public void run() {
         try {
-            String word;
-            while (!(word = words.take()).equals(ProducerConsumerStarter
-                    .POISON)) {
+            while (true) {
+                String word = words.take();
+
+                if (word.equals(ProducerConsumerStarter.POISON)) {
+                    words.put(word);
+                    break;
+                }
+
                 String alphabeticalWord = getAlphabeticalString(word);
                 anagramsMap.computeIfAbsent(alphabeticalWord, k ->
                         new HashSet<>()).add(word);

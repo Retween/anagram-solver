@@ -7,17 +7,13 @@ import org.apache.commons.cli.*;
 import java.io.File;
 
 public class CommandLineParser {
-    private Options options;
+    private final static Options options = new Options();
     private File inputFile;
     private File outputFile;
     private int producersCount;
     private int consumersCount;
 
-    public void parseCommandLine(String[] args) throws ParseException,
-            AnagramSolverAppException {
-        options = new Options();
-        org.apache.commons.cli.CommandLineParser parser = new DefaultParser();
-
+    static {
         options.addRequiredOption("i", "inputFile", true,
                 "File with URL addresses list");
         options.addRequiredOption("o", "outputFile", true,
@@ -26,8 +22,13 @@ public class CommandLineParser {
                 "Number of producers threads (>=1)");
         options.addRequiredOption("c", "consumersNumber", true,
                 "Number of consumers threads (>=1)");
+    }
 
+    public void parseCommandLine(String[] args) throws ParseException,
+            AnagramSolverAppException {
+        org.apache.commons.cli.CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
+
         inputFile = new File(cmd.getOptionValue("i"));
         outputFile = new File(cmd.getOptionValue("o"));
         producersCount = Integer.parseInt(cmd.getOptionValue("p"));
@@ -53,10 +54,12 @@ public class CommandLineParser {
 
     public void printHelp() {
         HelpFormatter formatter = new HelpFormatter();
+
         String syntax = "Main";
         String usageHeader = "Example of Using anagram-solver app";
         String usageFooter = "Usage example: -i inputFile.txt -o " +
                 "outputFile.txt -p 4 -c 4";
+
         formatter.printHelp(syntax, usageHeader, options, usageFooter);
     }
 
@@ -74,5 +77,15 @@ public class CommandLineParser {
 
     public int getProducersCount() {
         return producersCount;
+    }
+
+    @Override
+    public String toString() {
+        return "CommandLineParser" + "[" +
+                "inputFile=" + inputFile +
+                ", outputFile=" + outputFile +
+                ", producersCount=" + producersCount +
+                ", consumersCount=" + consumersCount +
+                ']';
     }
 }

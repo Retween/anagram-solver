@@ -59,7 +59,7 @@ public class Main {
                 AnagramsToOutputStreamWriter writer =
                         new AnagramsToOutputStreamWriter(outputStream);
 
-                writer.writeListToFile(starter.getAnagramsList());
+                writer.writeListToFile(starter.getAnagramsMap());
             }
         } catch (Exception e) {
             if (e instanceof ParseException) {

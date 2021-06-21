@@ -22,16 +22,9 @@ public class ParserTest {
     @Before
     public void setUp() throws IOException {
         expectedQueue = new ArrayBlockingQueue<>(10);
-        expectedQueue.add("что");
-        expectedQueue.add("либо");
-        expectedQueue.add("зачем");
         expectedQueue.add("когда");
-        expectedQueue.add("смотреть");
-        expectedQueue.add("кливленд");
         expectedQueue.add("привет");
         expectedQueue.add("крым");
-        expectedQueue.add("как");
-        expectedQueue.add("нога");
 
         InputStream testFile = new FileInputStream("src/test/data/testURL.txt");
         Queue<String> process = new InputStreamToQueueReader(testFile)

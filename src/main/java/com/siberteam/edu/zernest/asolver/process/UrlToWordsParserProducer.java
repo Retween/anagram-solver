@@ -53,21 +53,15 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
 
     private void parseString(String inputString) throws InterruptedException {
         if (!inputString.isEmpty()) {
-            for (String word : inputString.toLowerCase()
-                    .split("[\\p{Punct}\\s«»+]")) {
-                if (word.matches("[А-Яа-яЁё]{3,}")      ////////////////Tokenizer
+            StringTokenizer tokenizer = new StringTokenizer(inputString);
+            while (tokenizer.hasMoreTokens()) {
+                String word = tokenizer.nextToken().toLowerCase();
+                if (word.matches("[А-Яа-яЁё]{3,}")
                         && !dictionary.contains(word)) {
                     dictionary.add(word);
                     words.put(word);
                 }
             }
-        }
-    }
-
-    private void parseString2(String inputString) throws InterruptedException {
-        if (!inputString.isEmpty()) {
-            StringTokenizer tokenizer = new StringTokenizer(inputString);
-//            while (tokenizer.hasMoreTokens())
         }
     }
 

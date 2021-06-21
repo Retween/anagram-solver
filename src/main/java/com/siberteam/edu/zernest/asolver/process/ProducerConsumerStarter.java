@@ -46,17 +46,14 @@ public class ProducerConsumerStarter {
         producersLatch.await();
         producersExecutor.shutdown();
 
-        for (int i = 0; i < consumersCount; i++) {
-            words.put(POISON);
-        }
+        words.put(POISON);
 
         consumersLatch.await();
         consumersExecutor.shutdown();
     }
 
-    public List<Set<String>> getAnagramsList() {
-        anagramsMap.entrySet().removeIf(entry -> entry.getValue().size() <= 1);
-        return new ArrayList<>(anagramsMap.values());
+    public Map<String, Set<String>> getAnagramsMap() {
+        return anagramsMap;
     }
 
     @Override
