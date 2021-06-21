@@ -14,8 +14,7 @@ public class AnagramsToOutputStreamWriter {
             throws IOException {
         List<Set<String>> anagramsList = trimMapToList(anagramsMap);
 
-        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                outputStream))) {
+        try (BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(outputStream))) {
             for (Set<String> stringSet : anagramsList) {
                 Iterator<String> value = stringSet.iterator();
                 bw.write(value.next() + ": ");

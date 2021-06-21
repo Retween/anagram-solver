@@ -18,9 +18,7 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
     private final Set<String> dictionary;
     private final CountDownLatch producersLatch;
 
-    public UrlToWordsParserProducer(Queue<String> process,
-                                    BlockingQueue<String> words,
-                                    Set<String> dictionary,
+    public UrlToWordsParserProducer(Queue<String> process, BlockingQueue<String> words, Set<String> dictionary,
                                     CountDownLatch producersLatch) {
         this.process = process;
         this.words = words;
@@ -30,22 +28,22 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
 
     @Override
     public void run() {
-        String urlFilePath = null;
+        String urlFilePath;
         try {
+
             while ((urlFilePath = process.poll()) != null) {
-                URL url = new URL(urlFilePath);
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(url.openStream()))) {
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(new URL(urlFilePath).openStream()))) {
                     String inputString;
                     while ((inputString = br.readLine()) != null) {
                         parseString(inputString);
                     }
+                } catch (IOException e) {
+                    log("Invalid URL: " + urlFilePath);
+                } catch (InterruptedException e) {
+                    log("Thread was interrupted " + "\tException: " + e);
                 }
             }
-        } catch (IOException e) {
-            log("Invalid URL: " + urlFilePath);
-        } catch (InterruptedException e) {
-            log("Thread was interrupted " + "\tException: " + e);
+
         } finally {
             producersLatch.countDown();
         }
@@ -56,8 +54,7 @@ public class UrlToWordsParserProducer implements Runnable, ILogger {
             StringTokenizer tokenizer = new StringTokenizer(inputString);
             while (tokenizer.hasMoreTokens()) {
                 String word = tokenizer.nextToken().toLowerCase();
-                if (word.matches("[А-Яа-яЁё]{3,}")
-                        && !dictionary.contains(word)) {
+                if (word.matches("[А-Яа-яЁё]{3,}") && !dictionary.contains(word)) {
                     dictionary.add(word);
                     words.put(word);
                 }

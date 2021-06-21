@@ -1,5 +1,6 @@
 package com.siberteam.edu.zernest.asolver.process;
 
+import com.google.common.collect.Sets;
 import com.siberteam.edu.zernest.asolver.interfaces.ILogger;
 
 import java.util.Arrays;
@@ -14,8 +15,7 @@ public class WordsToAnagramHandlerConsumer implements Runnable, ILogger {
     private final Map<String, Set<String>> anagramsMap;
     private final CountDownLatch consumersLatch;
 
-    public WordsToAnagramHandlerConsumer(BlockingQueue<String> words,
-                                         Map<String, Set<String>> anagramsMap,
+    public WordsToAnagramHandlerConsumer(BlockingQueue<String> words, Map<String, Set<String>> anagramsMap,
                                          CountDownLatch consumersLatch) {
         this.words = words;
         this.anagramsMap = anagramsMap;
@@ -34,8 +34,7 @@ public class WordsToAnagramHandlerConsumer implements Runnable, ILogger {
                 }
 
                 String alphabeticalWord = getAlphabeticalString(word);
-                anagramsMap.computeIfAbsent(alphabeticalWord, k ->
-                        new HashSet<>()).add(word);
+                anagramsMap.computeIfAbsent(alphabeticalWord, k -> Sets.newConcurrentHashSet()).add(word);
             }
         } catch (InterruptedException e) {
             log("Thread was interrupted " + "\nException: " + e);

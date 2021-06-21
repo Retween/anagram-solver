@@ -13,28 +13,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Main {
-    private static final Map<Class<?>, IErrorHandler> errorHandlerMap =
-            new HashMap<>();
+    private static final Map<Class<?>, IErrorHandler> errorHandlerMap = new HashMap<>();
 
-    private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode =
-            new HashMap<>();
+    private static final Map<Class<?>, AnagramSolverExitCode> errorExitCode = new HashMap<>();
 
     private static final IErrorHandler defaultHandler = new IErrorHandler() {
         @Override
-        public void handleException(AnagramSolverExitCode exitCode,
-                                    Exception e) {
+        public void handleException(AnagramSolverExitCode exitCode, Exception e) {
             IErrorHandler.super.handleException(exitCode, e);
         }
     };
 
     static {
         errorHandlerMap.put(InterruptedException.class, defaultHandler);
-        errorExitCode.put(InterruptedException.class, AnagramSolverExitCode
-                .INTERRUPTED);
+        errorExitCode.put(InterruptedException.class, AnagramSolverExitCode.INTERRUPTED);
 
         errorHandlerMap.put(IOException.class, defaultHandler);
-        errorExitCode.put(IOException.class, AnagramSolverExitCode
-                .INPUT_OUTPUT);
+        errorExitCode.put(IOException.class, AnagramSolverExitCode.INPUT_OUTPUT);
 
         errorHandlerMap.put(AnagramSolverAppException.class, defaultHandler);
     }
@@ -44,41 +39,33 @@ public class Main {
         try {
             parser.parseCommandLine(args);
 
-            try (InputStream inputStream = new FileInputStream(parser
-                    .getInputFile());
-                 OutputStream outputStream = new FileOutputStream(parser
-                         .getOutputFile())) {
-                InputStreamToQueueReader reader =
-                        new InputStreamToQueueReader(inputStream);
+            try (InputStream inputStream = new FileInputStream(parser.getInputFile());
+                 OutputStream outputStream = new FileOutputStream(parser.getOutputFile())) {
+                InputStreamToQueueReader reader = new InputStreamToQueueReader(inputStream);
 
                 ProducerConsumerStarter starter = new ProducerConsumerStarter(
-                        reader.getUrlQueue(), parser.getProducersCount(),
-                        parser.getConsumersCount());
+                        reader.getUrlQueue(), parser.getProducersCount(), parser.getConsumersCount());
                 starter.startThreads();
 
-                AnagramsToOutputStreamWriter writer =
-                        new AnagramsToOutputStreamWriter(outputStream);
+                AnagramsToOutputStreamWriter writer = new AnagramsToOutputStreamWriter(outputStream);
 
                 writer.writeListToFile(starter.getAnagramsMap());
             }
         } catch (Exception e) {
             if (e instanceof ParseException) {
                 parser.printHelp();
-                defaultHandler.handleException(AnagramSolverExitCode
-                        .COMMAND_LINE_USAGE, e);
+                defaultHandler.handleException(AnagramSolverExitCode.COMMAND_LINE_USAGE, e);
             }
 
             IErrorHandler handler = errorHandlerMap.get(e.getClass());
             if (handler != null) {
                 if (e instanceof AnagramSolverAppException) {
-                    handler.handleException(((AnagramSolverAppException) e)
-                            .getExitCode(), e);
+                    handler.handleException(((AnagramSolverAppException) e).getExitCode(), e);
                 }
                 handler.handleException(errorExitCode.get(e.getClass()), e);
             }
 
-            defaultHandler.handleException(AnagramSolverExitCode
-                    .UNEXPECTED_ERROR, e);
+            defaultHandler.handleException(AnagramSolverExitCode.UNEXPECTED_ERROR, e);
         }
     }
 }

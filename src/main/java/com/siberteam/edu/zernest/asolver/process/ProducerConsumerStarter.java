@@ -34,13 +34,11 @@ public class ProducerConsumerStarter {
 
     public void startThreads() throws InterruptedException {
         for (int i = 0; i < producersCount; i++) {
-            producersExecutor.execute(new UrlToWordsParserProducer(process,
-                    words, dictionary, producersLatch));
+            producersExecutor.execute(new UrlToWordsParserProducer(process, words, dictionary, producersLatch));
         }
 
         for (int i = 0; i < consumersCount; i++) {
-            consumersExecutor.execute(new WordsToAnagramHandlerConsumer(words,
-                    anagramsMap, consumersLatch));
+            consumersExecutor.execute(new WordsToAnagramHandlerConsumer(words, anagramsMap, consumersLatch));
         }
 
         producersLatch.await();

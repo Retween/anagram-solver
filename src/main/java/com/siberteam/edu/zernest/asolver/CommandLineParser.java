@@ -24,8 +24,7 @@ public class CommandLineParser {
                 "Number of consumers threads (>=1)");
     }
 
-    public void parseCommandLine(String[] args) throws ParseException,
-            AnagramSolverAppException {
+    public void parseCommandLine(String[] args) throws ParseException, AnagramSolverAppException {
         org.apache.commons.cli.CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
@@ -40,11 +39,11 @@ public class CommandLineParser {
                     inputFile.getName());
         }
 
-        if (outputFile.exists() && outputFile.isFile()) {
-            throw new AnagramSolverAppException(
-                    AnagramSolverExitCode.FILE_ALREADY_EXISTS,
-                    outputFile.getName());
-        }
+//        if (outputFile.exists() && outputFile.isFile()) {
+//            throw new AnagramSolverAppException(
+//                    AnagramSolverExitCode.FILE_ALREADY_EXISTS,
+//                    outputFile.getName());
+//        }
 
         if (producersCount < 1 || consumersCount < 1) {
             throw new ParseException("producersCount: " + producersCount
